@@ -8,13 +8,114 @@ It provides APIs to manage products, categories, and users, while ensuring effic
 The backend demonstrates how backend engineers can design, optimize, and document APIs in a production-like environment.
 
 ---
+## Main Functionalities
+### 1. CRUD APIs
 
-## Project Goals
-- **CRUD APIs**: Implement create, read, update, and delete operations for products, categories, and users.  
-- **Filtering, Sorting, Pagination**: Support efficient product discovery with dynamic queries.  
-- **Database Optimization**: Design relational schemas and apply indexing/query optimization for better performance.  
-- **Authentication & Security**: Provide secure user authentication and role-based access using **JWT**.  
-- **API Documentation**: Generate and publish API documentation for seamless frontend integration.
+#### Features:
+
+* Create, read, update, and delete operations for products, categories, and users.
+
+* Role-based restrictions (e.g., only admins can create/update/delete products).
+
+* Standardized RESTful endpoints for consistency.
+
+#### Benefits:
+
+* Ensures flexibility in managing catalog and users.
+
+* Keeps data up-to-date with minimal effort.
+
+* Provides a strong foundation for frontend apps (web or mobile) to consume data seamlessly.
+
+### 2. Filtering, Sorting, Pagination
+
+#### Features:
+
+* Filter products by category, price range, availability.
+
+* Sort products by price, name, or newest.
+
+* Paginated responses for large datasets.
+
+#### Benefits:
+
+* Enhances user experience with faster product discovery.
+
+* Reduces server load by avoiding unnecessary large payloads.
+
+* Ensures scalability for growing product catalogs.
+
+### 3. Database Optimization
+
+#### Features:
+
+* Well-structured relational schema with proper indexes.
+
+* Query optimization with select_related and prefetch_related.
+
+* Caching frequently accessed queries.
+
+#### Benefits:
+
+* High performance even with thousands of products.
+
+* Reduces query execution time, leading to faster API responses.
+
+* Ensures smooth scalability as traffic grows.
+
+### 4. Authentication & Security (JWT)
+
+#### Features:
+
+* Secure user registration & login with JWT tokens.
+
+* Role-based access (e.g customer vs. admin).
+
+* Token expiration and refresh mechanism.
+
+#### Benefits:
+
+* Protects sensitive endpoints from unauthorized access.
+
+* Provides a safe shopping environment for users.
+
+* Ensures compliance with modern security standards.
+
+### 5. API Documentation (Swagger / OpenAPI)
+
+#### Features:
+
+* Auto-generated interactive API documentation.
+
+* Live testing of endpoints directly from Swagger UI.
+
+* Postman collection export for external testing.
+
+#### Benefits:
+
+* Simplifies frontend-backend collaboration.
+
+* Ensures APIs are discoverable and easy to use.
+
+* Speeds up onboarding for new developers.
+
+### 6. Payment Integration (M-Pesa, PayPal, Visa)
+
+#### Features:
+
+* Support for multiple payment gateways (M-Pesa, PayPal, Visa).
+
+* Secure payment initiation and verification endpoints.
+
+* Transaction history tracking.
+
+#### Benefits:
+
+* Provides payment flexibility to customers.
+
+* Builds trust with secure payment handling.
+
+* Expands market reach by supporting global & local payment methods.
 
 ---
 
@@ -23,61 +124,97 @@ The backend demonstrates how backend engineers can design, optimize, and documen
 - **[PostgreSQL](https://www.postgresql.org/)** – Robust relational database with strong query optimization.  
 - **[JWT](https://jwt.io/)** – JSON Web Tokens for secure user authentication and authorization.  
 - **Swagger/OpenAPI** – Interactive API documentation and testing.
+ 
 
 ---
-
-## Key Features
-### 1. CRUD Operations
-- Manage **Products** and **Categories** via RESTful APIs.  
-- User authentication and account management using **JWT**.  
-
-### 2. API Features
-- **Filtering & Sorting**: Filter products by category, price, stock status. 
-- **Pagination**: Efficiently handle large product datasets with paginated responses.  
-
-### 3. API Documentation
-- Swagger/OpenAPI integrated for live API testing.  
-- Postman collections for external testing and frontend integration.  
-
----
-API Endpoints
+## API Endpoints
 
 ### 1. User Authentication
-#### Register
-POST /api/users/register/
+POST /api/users/register/ - Register
 
-#### Login
-POST /api/users/login/
+POST /api/users/login/ - login
+ 
+GET /api/users/me/ - Get Profile
 
-#### Get Profile
-GET /api/users/me/
+PATCH /api/users/me/ - Update Profile
 
-#### Update Profile
-PATCH /api/users/me/
+POST /api/users/change-password/ - Change Password
 
-#### Change Password
-POST /api/users/change-password/
-
-#### Password Reset
-POST /api/users/reset-password/
+POST /api/users/reset-password/ - Password Reset
 
 ### 2. Products
-#### Create Product
-POST /api/products/
+POST /api/products/ -  Create Product
 
-#### List Products (with filtering, sorting, pagination)
-GET /api/products/?category=category_id&sort=sort_field&page=page_number&page_size=page_size
+GET /api/products/?category=category_id&sort=sort_field&page=page_number&page_size=page_size - List Products (with filtering, sorting, pagination)
 
-#### Update Product
-PUT /api/products/{product_id}/
+PUT /api/products/{product_id}/ - Update Product
 
-#### Partial Update Product
-PATCH /api/products/{product_id}/
+PATCH /api/products/{product_id}/ - Partial Update Product
 
-#### Delete Product
-DELETE /api/products/{product_id}/
+DELETE /api/products/{product_id}/ - Delete Product
 
 ### 3. Categories
-#### Create Category
-POST /api/categories/
+POST /api/categories/ - create category (admin only)
+
+PUT /api/categories/{category_id}- Update category
+
+DELETE /api/categories/{category_id} - Delete category
+
+### 4. Shopping Cart
+GET /api/cart/ → Get user’s shopping cart
+
+POST /api/cart/ → Add item to cart
+
+PATCH /api/cart/{item_id}/ → Update cart item (e.g., quantity)
+
+DELETE /api/cart/{item_id}/ → Remove item from cart
+
+DELETE /api/cart/clear/ → Clear the entire cart
+
+### 5. Wishlist
+GET /api/favorites/ → Get all favorite items
+
+POST /api/favorites/ → Add product to favorites
+
+DELETE /api/favorites/{product_id}/ → Remove product from favorites
+
+### 6. Orders & Checkout
+POST /api/checkout/ → Convert cart into an order
+
+GET /api/orders/ → Get all orders for logged-in user
+
+GET /api/orders/{order_id}/ → Get single order details
+
+PATCH /api/orders/{order_id}/status/ → Update order status (admin only)
+
+### 7. Payments
+
+POST /api/payments/initiate/ → Initiate payment (Stripe/PayPal/m-pesa integration)
+
+POST /api/payments/verify/ → Verify payment transaction
+
+GET /api/payments/history/ → List user’s payment history
+
+### 8. Reviews & Ratings
+POST /api/products/{product_id}/reviews/ → Add review for a product
+
+GET /api/products/{product_id}/reviews/ → Get product reviews
+
+PATCH /api/reviews/{review_id}/ → Update review
+
+DELETE /api/reviews/{review_id}/ → Delete review
+
+### 9.Admin
+
+GET /api/admin/dashboard/ → Sales summary, order counts, etc.
+
+GET /api/admin/users/ → Manage users
+
+GET /api/admin/orders/ → Manage all orders
+
+GET /api/admin/products/low-stock/ → Inventory alerts
+
+## Entity Relationship Diagram 
+
+- Link to  the  → **[ERD](https://dbdiagram.io/d/Geocel-Enterprises-ERD-666c20c6a179551be6e449bf)**
 
