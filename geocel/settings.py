@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'orders',
     'payments',
     'reviews',
+    'core',     #shared components app
 ]
 
 MIDDLEWARE = [
