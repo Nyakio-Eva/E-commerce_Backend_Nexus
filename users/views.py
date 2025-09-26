@@ -17,9 +17,9 @@ from orders.models import Order
 
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer,
-    ProductListSerializer,
-    OrderSerializer, 
 )
+from products.serializers import ProductListSerializer
+from orders.serializers import OrderSerializer
 from core.pagination import StandardResultsSetPagination
 
 from .serializers import (
