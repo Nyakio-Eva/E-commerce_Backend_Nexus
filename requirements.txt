@@ -1,10 +1,10 @@
 # Core Django and DRF
 Django==4.2.7
 djangorestframework==3.14.0
-djangorestframework-simplejwt==5.2.2  # Older stable version
+djangorestframework-simplejwt==5.2.2
 
 # Essential system packages
-setuptools>=65.0.0
+setuptools>=65.0.0,<81
 wheel>=0.38.0
 
 # Database
@@ -20,8 +20,8 @@ django-filter==23.3
 # Environment variables
 python-dotenv==1.0.0
 
-# Image handling
-Pillow==10.1.0
+# Image handling - Updated for Python 3.13 compatibility
+Pillow>=10.2.0
 
 # API documentation
 drf-spectacular==0.26.5
@@ -33,19 +33,11 @@ whitenoise==6.6.0
 gunicorn==21.2.0
 
 # Security
-cryptography==41.0.7
+cryptography>=41.0.7
 
 # Redis for caching (optional)
-redis==5.0.1
-django-redis==5.4.0
+redis>=5.0.1
+django-redis>=5.4.0
 
-# Development tools (optional)
-django-extensions==3.2.3
-
-# Testing
-pytest==7.4.3
-pytest-django==4.7.0
-factory-boy==3.3.0
-
-# Monitoring and debugging (development only)
-django-debug-toolbar==4.2.0
+# Development tools (optional for production)
+django-extensions>=3.2.3
