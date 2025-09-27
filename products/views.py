@@ -27,7 +27,7 @@ class CategoryListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAdminOrReadOnly]
     pagination_class = StandardResultsSetPagination  # Using core pagination
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_class = CategoryFilter  # If you create CategoryFilter
+    filterset_class = CategoryFilter  # create CategoryFilter
     search_fields = ['name', 'description']
     
     def get_serializer_class(self):

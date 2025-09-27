@@ -147,7 +147,7 @@ class CartSummaryView(APIView):
             'item_count': item_count,  # Unique products
             'total_items': total_items,  # Total quantity
             'total_amount': total_amount,
-            'currency': 'USD'
+            'currency': 'KES'
         })
 
 @api_view(['DELETE'])

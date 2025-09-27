@@ -38,7 +38,7 @@ class PaymentInitiateView(APIView):
                 transaction_id=transaction_id
             )
             
-            # Here you would integrate with actual payment gateways
+            # integrate with actual payment gateways
             # For demo purposes, we'll return mock payment data
             
             response_data = {

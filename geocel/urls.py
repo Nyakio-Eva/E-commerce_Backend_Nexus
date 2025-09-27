@@ -24,5 +24,11 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/users/', include('users.urls')), # Register/Login endpoints
     path('api/products/', include('products.urls')), #products/categories endpoints
+    path('api/cart/', include('cart.urls', namespace='cart')), #cart and cart items 
+    path('api/favorites/', include('favorites.urls', namespace='favorites')), #wishlist endpoints
+    path('api/orders/', include('orders.urls')), #orders endpoints
+    path('api/reviews/', include('reviews.urls')), #reviews
+    path('api/products/', include('reviews.urls')), #product reviews
+    path('api/payments/', include('payments.urls')),
     
 ]
