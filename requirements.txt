@@ -8,7 +8,7 @@ setuptools>=65.0.0,<75
 wheel>=0.38.0
 
 # Database - Updated for better compatibility
-psycopg[binary]==3.1.13
+psycopg[binary]==3.2.10
 # Alternative: psycopg[binary]==3.1.13  # Use this if psycopg2 fails
 dj-database-url==2.1.0
 
