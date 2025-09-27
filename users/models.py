@@ -1,6 +1,9 @@
 # models.py
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+import uuid
+from django.utils import timezone
+from datetime import timedelta
 
 class CustomUserManager(BaseUserManager):
     """Custom manager for User model with email as the unique identifier."""
@@ -25,6 +28,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('role', 'admin')
+        extra_fields.setdefault('is_email_verified', True)  # Auto-verify superuser
         
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
@@ -37,6 +41,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_email_verified = models.BooleanField(default=False)
     
     # Role choices
     CUSTOMER = 'customer'
@@ -64,3 +69,27 @@ class User(AbstractUser):
         db_table = 'auth_user'  # keeps the same table name
         verbose_name = 'User'
         verbose_name_plural = 'Users'
+
+
+class EmailVerificationToken(models.Model):
+    """Model to store email verification tokens"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='verification_tokens')
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            # Token expires in 24 hours
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        super().save(*args, **kwargs)
+    
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+    
+    def __str__(self):
+        return f"Verification token for {self.user.email}"
+    
+    class Meta:
+        ordering = ['-created_at']

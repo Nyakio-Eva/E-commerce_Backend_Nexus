@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_filters',
     'corsheaders',
+    'django.core.mail'
     # local apps
     'users',
     'products',
@@ -248,9 +249,14 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        'your_app_name': {
+        'geocel': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
+            'propagate': True,
+        },
+        'geocel.utils.email_service': { 
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
             'propagate': True,
         },
     },
