@@ -145,7 +145,7 @@ POST /api/users/reset-password/ - Password Reset
 ### 2. Products
 POST /api/products/ -  Create Product
 
-GET /api/products/?category=category_id&sort=sort_field&page=page_number&page_size=page_size - List Products (with filtering, sorting, pagination)
+GET /api/products/?category=category_id&ordering=sort_field&page=page_number&page_size=page_size - List Products (with filtering, sorting, pagination)
 
 PUT /api/products/{product_id}/ - Update Product
 
@@ -165,21 +165,23 @@ GET /api/cart/ → Get user’s shopping cart
 
 POST /api/cart/ → Add item to cart
 
-PATCH /api/cart/{item_id}/ → Update cart item (e.g., quantity)
+PATCH /api/cart/items/{item_id}/ → Update cart item (e.g., quantity)
 
-DELETE /api/cart/{item_id}/ → Remove item from cart
+POST /api/cart/items/{item_id}/move-to-favorites/ → add item to favorites
+
+DELETE /api/cart/items/{item_id}/ → Remove item from cart
 
 DELETE /api/cart/clear/ → Clear the entire cart
 
 ### 5. Wishlist
 GET /api/favorites/ → Get all favorite items
 
-POST /api/favorites/ → Add product to favorites
+POST /api/favorites/add/ → Add product to favorites
 
 DELETE /api/favorites/{product_id}/ → Remove product from favorites
 
 ### 6. Orders & Checkout
-POST /api/checkout/ → Convert cart into an order
+POST /api/orders/checkout/ → Convert cart into an order
 
 GET /api/orders/ → Get all orders for logged-in user
 
@@ -206,15 +208,18 @@ DELETE /api/reviews/{review_id}/ → Delete review
 
 ### 9.Admin
 
-GET /api/admin/dashboard/ → Sales summary, order counts, etc.
+GET /api/users/admin/dashboard/ → Sales summary, order counts, etc.
 
-GET /api/admin/users/ → Manage users
+GET /api/users/admin/users/ → Manage users
 
-GET /api/admin/orders/ → Manage all orders
+GET /api/users/admin/orders/ → Manage all orders
 
-GET /api/admin/products/low-stock/ → Inventory alerts
+GET /api/users/admin/products/low-stock/ → Inventory alerts
 
-## Entity Relationship Diagram 
+ 
+
+## Entity Relationship Diagram and Flowchart
 
 - Link to  the  → **[ERD](https://dbdiagram.io/d/Geocel-Enterprises-ERD-666c20c6a179551be6e449bf)**
+- Link to the  → **[FlowChart for processes](https://excalidraw.com/#json=L8IIOeAZwBUv1s2RahAJ0,nmx8XTwIhszSTSpf8G2-RA)**
 
