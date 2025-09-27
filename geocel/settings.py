@@ -14,13 +14,11 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-
-#load the .env file
+# Load the .env file
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -29,13 +27,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG")
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = []
+# Updated ALLOWED_HOSTS for Render deployment
+ALLOWED_HOSTS = [
+    'localhost', 
+    '127.0.0.1',
+    '0.0.0.0',
+    # Add your Render domain when you get it
+    # 'your-app-name.onrender.com'
+]
 
+# Get allowed hosts from environment variable for production
+if os.getenv('ALLOWED_HOSTS'):
+    ALLOWED_HOSTS.extend(os.getenv('ALLOWED_HOSTS').split(','))
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,15 +50,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # django defaults...
+    # Third party apps
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
-    'drf_spectacular',
+    'drf_spectacular',  # Updated from drf_yasg
     'django_filters',
     'corsheaders',
-    'django.core.mail'
-    # local apps
+    # Local apps
     'users',
     'products',
     'cart',
@@ -59,13 +65,14 @@ INSTALLED_APPS = [
     'payments',
     'reviews',
     'favorites',
-    'core',     #shared components app
+    'core',  # shared components app
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # For static files in production
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # Add this for CORS
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -78,7 +85,7 @@ ROOT_URLCONF = 'geocel.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],  # For Swagger UI templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -92,7 +99,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'geocel.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -102,17 +108,19 @@ DATABASES = {
         'NAME': os.getenv("DATABASE_NAME"),
         'USER': os.getenv("DATABASE_USER"),
         'PASSWORD': os.getenv("DATABASE_PASSWORD"),
-        'HOST': os.getenv("DATABASE_HOST"),
-        'PORT': os.getenv("DATABASE_PORT"),
+        'HOST': os.getenv("DATABASE_HOST", "localhost"),
+        'PORT': os.getenv("DATABASE_PORT", "5432"),
     }
 }
 
+# For Render PostgreSQL, you might get a DATABASE_URL
+import dj_database_url
+if os.getenv('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.parse(os.getenv('DATABASE_URL'))
 
 AUTH_USER_MODEL = 'users.User'
 
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -128,31 +136,26 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-# Static files and media files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# Static files storage for production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # REST Framework configuration
@@ -177,6 +180,104 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.MultiPartParser',
         'rest_framework.parsers.FormParser',
+    ],
+    # Add Spectacular as the default schema generator
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# DRF Spectacular settings for Swagger documentation
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'E-commerce Backend Nexus API',
+    'DESCRIPTION': '''
+    A comprehensive e-commerce backend API with advanced features including:
+    
+     **Product Management**: Complete CRUD operations for products and categories
+     **Authentication**: JWT-based secure authentication with role-based access
+     **Shopping Cart**: Full cart management with item operations
+     **Wishlist**: Favorite products management
+     **Order Management**: Complete checkout and order processing
+     **Payment Integration**: Multiple payment gateways (M-Pesa, PayPal, Visa)
+     **Reviews & Ratings**: Product review system
+     **Advanced Filtering**: Search, filter, sort, and pagination
+     **Admin Features**: Dashboard, inventory management, user management
+    
+    ## Authentication
+    This API uses JWT (JSON Web Tokens) for authentication. Include the token in the Authorization header:
+    `Authorization: Bearer <your_token>`
+    
+    ## Rate Limiting
+    API requests are rate-limited to ensure fair usage and optimal performance.
+    
+    ## Pagination
+    Most list endpoints support pagination with `page` and `page_size` parameters.
+    ''',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'CONTACT': {
+        'name': 'E-commerce Backend Team',
+        'email': 'dev@ecommerce-nexus.com',
+    },
+    'LICENSE': {
+        'name': 'MIT License',
+    },
+    'TAGS': [
+        {
+            'name': 'Authentication',
+            'description': 'User registration, login, profile management'
+        },
+        {
+            'name': 'Products',
+            'description': 'Product and category management'
+        },
+        {
+            'name': 'Shopping Cart',
+            'description': 'Cart and cart item operations'
+        },
+        {
+            'name': 'Orders',
+            'description': 'Order processing and management'
+        },
+        {
+            'name': 'Payments',
+            'description': 'Payment processing and transaction history'
+        },
+        {
+            'name': 'Reviews',
+            'description': 'Product reviews and ratings'
+        },
+        {
+            'name': 'Favorites',
+            'description': 'Wishlist and favorite products'
+        },
+        {
+            'name': 'Admin',
+            'description': 'Administrative operations and dashboard'
+        },
+    ],
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SORT_OPERATIONS': False,
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
+    'SERVE_AUTHENTICATION': None,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': False,
+        'defaultModelsExpandDepth': 2,
+        'defaultModelExpandDepth': 2,
+        'displayRequestDuration': True,
+        'docExpansion': 'none',
+        'filter': True,
+        'showExtensions': True,
+        'showCommonExtensions': True,
+    },
+    'REDOC_SETTINGS': {
+        'LAZY_RENDERING': True,
+    },
+    'PREPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.preprocess_exclude_path_format',
+    ],
+    'POSTPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.postprocess_schema_enums',
     ],
 }
 
@@ -203,6 +304,8 @@ CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if os.ge
     "http://127.0.0.1:3000",
     "http://localhost:8080",
     "http://127.0.0.1:8080",
+    "http://localhost:5173",  # Vite default port
+    "http://127.0.0.1:5173",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -221,49 +324,61 @@ CORS_ALLOWED_HEADERS = [
 
 # Email configuration (for password reset, etc.)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS').lower() == 'true'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
 # Logging configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': 'ecommerce.log',
+            'formatter': 'verbose',
         },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
         },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
     },
     'loggers': {
         'django': {
             'handlers': ['file', 'console'],
             'level': 'INFO',
-            'propagate': True,
+            'propagate': False,
         },
         'geocel': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
-            'propagate': True,
-        },
-        'geocel.utils.email_service': { 
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': True,
+            'propagate': False,
         },
     },
 }
 
 # Security settings for production
 if not DEBUG:
+    # SSL/HTTPS settings
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -272,3 +387,29 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Additional security headers
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+    
+    # Trust proxy headers from Render
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Cache configuration (optional, for production optimization)
+if not DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
+
+# File upload settings
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
