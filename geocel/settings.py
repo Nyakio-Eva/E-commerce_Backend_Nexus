@@ -29,16 +29,28 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-# Updated ALLOWED_HOSTS for Render deployment
-ALLOWED_HOSTS = [
-    'localhost', 
-    '127.0.0.1',
-    '0.0.0.0',
-]
+# ALLOWED_HOSTS configuration
+ALLOWED_HOSTS = []
 
-# Get allowed hosts from environment variable for production
-if os.getenv('ALLOWED_HOSTS'):
-    ALLOWED_HOSTS.extend(os.getenv('ALLOWED_HOSTS').split(','))
+# Get allowed hosts from environment variable
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# Add localhost for development
+if DEBUG:
+    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
+
+
+
+# manually specify your domain
+ALLOWED_HOSTS.extend([
+    'e-commerce-backend-nexus-api.onrender.com',
+    # Add other domains as needed
+])
+
+# Remove duplicates
+ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
 # Application definition
 INSTALLED_APPS = [
@@ -192,15 +204,15 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': '''
     A comprehensive e-commerce backend API with advanced features including:
     
-    🛍️ **Product Management**: Complete CRUD operations for products and categories
-    🔐 **Authentication**: JWT-based secure authentication with role-based access
-    🛒 **Shopping Cart**: Full cart management with item operations
-    ❤️ **Wishlist**: Favorite products management
-    📦 **Order Management**: Complete checkout and order processing
-    💳 **Payment Integration**: Multiple payment gateways (M-Pesa, PayPal, Visa)
-    ⭐ **Reviews & Ratings**: Product review system
-    🎯 **Advanced Filtering**: Search, filter, sort, and pagination
-    👑 **Admin Features**: Dashboard, inventory management, user management
+    **Product Management**: Complete CRUD operations for products and categories
+    **Authentication**: JWT-based secure authentication with role-based access
+    **Shopping Cart**: Full cart management with item operations
+    **Wishlist**: Favorite products management
+    **Order Management**: Complete checkout and order processing
+    **Payment Integration**: Multiple payment gateways (M-Pesa, PayPal, Visa)
+    **Reviews & Ratings**: Product review system
+    **Advanced Filtering**: Search, filter, sort, and pagination
+    **Admin Features**: Dashboard, inventory management, user management
     
     ## Authentication
     This API uses JWT (JSON Web Tokens) for authentication. Include the token in the Authorization header:
