@@ -41,10 +41,10 @@ services:
     
   # PostgreSQL database
   - type: pserv
-    name: ecommerce-db
+    name: geocel
     plan: free  # Change to 'starter' or higher for production
-    databaseName: ecommerce_db
-    user: ecommerce_user
+    databaseName: geocel_db
+    user: postgres
 
   # Redis for caching (optional - remove if not needed)
   - type: redis
