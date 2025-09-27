@@ -1,30 +1,31 @@
 # Core Django and DRF
-Django==4.2.7
+Django==4.2.16
 djangorestframework==3.14.0
-djangorestframework-simplejwt==5.2.2
+djangorestframework-simplejwt==5.3.0
 
 # Essential system packages
-setuptools>=65.0.0,<81
+setuptools>=65.0.0,<75
 wheel>=0.38.0
 
-# Database
+# Database - Updated for better compatibility
 psycopg2-binary==2.9.9
+# Alternative: psycopg[binary]==3.1.13  # Use this if psycopg2 fails
 dj-database-url==2.1.0
 
 # CORS handling
 django-cors-headers==4.3.1
 
 # Filtering and search
-django-filter==23.3
+django-filter==23.5
 
 # Environment variables
 python-dotenv==1.0.0
 
-# Image handling - Updated for Python 3.13 compatibility
-Pillow>=10.2.0
+# Image handling - Updated for Python 3.11+ compatibility
+Pillow>=10.0.0,<11.0.0
 
 # API documentation
-drf-spectacular==0.26.5
+drf-spectacular==0.27.0
 
 # Static files handling for production
 whitenoise==6.6.0
