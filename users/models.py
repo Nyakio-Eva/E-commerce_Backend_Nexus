@@ -9,15 +9,10 @@ class CustomUserManager(BaseUserManager):
     """Custom manager for User model with email as the unique identifier."""
     
     def create_user(self, email, password=None, **extra_fields):
-        """Create and return a regular user with an email and password."""
         if not email:
-            raise ValueError('The Email field must be set')
-        
+            raise ValueError("The Email field must be set")
+
         email = self.normalize_email(email)
-        # Generate username from email if not provided
-        if not extra_fields.get('username'):
-            extra_fields['username'] = email.split('@')[0]
-            
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -38,6 +33,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
+    username = None
     email = models.EmailField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
