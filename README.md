@@ -1,11 +1,12 @@
 # E-commerce_Backend_Nexus
 
-
 ## Overview
-This project simulates a **real-world e-commerce backend**, designed with a focus on **scalability, security, and performance**.  
-It provides APIs to manage products, categories, and users, while ensuring efficient data retrieval through **filtering, sorting, and pagination**.  
+TThe E-commerce Backend Nexus is a production-ready backend API that powers a modern e-commerce system.
+It is designed with a strong emphasis on scalability, security, and performance.
 
-The backend demonstrates how backend engineers can design, optimize, and document APIs in a production-like environment.
+The system provides features such as user authentication, product/catalog management, shopping carts, wishlists, orders, payments, and reviews, all accessible via well-documented RESTful APIs.
+
+It also comes with interactive API documentation via Swagger for live testing.
 
 ---
 ## Main Functionalities
@@ -121,105 +122,140 @@ The backend demonstrates how backend engineers can design, optimize, and documen
 
 ## Technologies Used
 - **[Django](https://www.djangoproject.com/)** – High-level Python web framework for scalable backend development.  
+- **[Django REST Framework (DRF)](https://www.django-rest-framework.org/)** - A powerful and flexible toolkit for building Web APIs.
 - **[PostgreSQL](https://www.postgresql.org/)** – Robust relational database with strong query optimization.  
 - **[JWT](https://jwt.io/)** – JSON Web Tokens for secure user authentication and authorization.  
 - **Swagger/OpenAPI** – Interactive API documentation and testing.
  
 
 ---
+## Getting Started (Local Setup)
+
+    1. Clone the Repository
+        git clone https://github.com/Nyakio-Eva/ecommerce-backend-nexus.git
+        cd ecommerce-backend-nexus
+
+    2. Create and Activate Virtual Environment
+        python -m venv venv
+        source venv/bin/activate   # For Linux/Mac
+        venv\Scripts\activate      # For Windows
+
+    3. Install Dependencies
+        pip install -r requirements.txt
+
+    4. Configure Database
+        Update your .env file with PostgreSQL credentials:
+
+        DATABASE_URL=postgres://user:password@localhost:5432/ecommerce_db
+        SECRET_KEY=your_secret_key
+        DEBUG=True
+
+    5. Run Migrations
+        python manage.py migrate
+
+    6. Create Superuser
+       python manage.py createsuperuser
+
+    7. Start Development Server
+        python manage.py runserver
+
+## API Documentation & Testing
+🔹 Swagger (Hosted)
+
+You can test the API live via Swagger UI at:
+👉 https://e-commerce-backend-nexus-api.onrender.com
+
+Here you can:
+
+- Authenticate using JWT tokens (Authorize button at the top right).
+
+- Test endpoints directly from the browser.
+
+- Explore request/response formats.
+
+
 ## API Endpoints
+### Authentication
 
-### 1. User Authentication
-POST /api/users/register/ - Register
+POST /api/users/register/ – Register
 
-POST /api/users/login/ - login
- 
-GET /api/users/me/ - Get Profile
+POST /api/users/login/ – Login
 
-PATCH /api/users/me/ - Update Profile
+GET /api/users/me/ – Get profile
 
-POST /api/users/change-password/ - Change Password
+PATCH /api/users/me/ – Update profile
 
-POST /api/users/reset-password/ - Password Reset
+POST /api/users/change-password/ – Change password
 
-### 2. Products
-POST /api/products/ -  Create Product
+POST /api/users/reset-password/ – Reset password
 
-GET /api/products/?category=category_id&ordering=sort_field&page=page_number&page_size=page_size - List Products (with filtering, sorting, pagination)
+### Products
 
-PUT /api/products/{product_id}/ - Update Product
+GET /api/products/ – List products (with filtering, sorting, pagination)
 
-PATCH /api/products/{product_id}/ - Partial Update Product
+POST /api/products/ – Create product (admin)
 
-DELETE /api/products/{product_id}/ - Delete Product
+PUT /api/products/{id}/ – Update product
 
-### 3. Categories
-POST /api/categories/ - create category (admin only)
+DELETE /api/products/{id}/ – Delete product
 
-PUT /api/categories/{category_id}- Update category
+### 3. Categories 
+POST /api/categories/ - create category (admin only) 
+PUT /api/categories/{category_id}- Update category 
+DELETE /api/categories/{category_id} - Delete category 
 
-DELETE /api/categories/{category_id} - Delete category
+### 4. Shopping Cart 
+GET /api/cart/ → Get user’s shopping cart 
+POST /api/cart/ → Add item to cart 
+PATCH /api/cart/items/{item_id}/ → Update cart item (e.g., quantity) 
+POST /api/cart/items/{item_id}/move-to-favorites/ → add item to favorites DELETE /api/cart/items/{item_id}/ → Remove item from cart 
+DELETE /api/cart/clear/ → Clear the entire cart 
 
-### 4. Shopping Cart
-GET /api/cart/ → Get user’s shopping cart
+### 5. Wishlist 
+GET /api/favorites/ → Get all favorite items 
+POST /api/favorites/add/ → Add product to favorites 
+DELETE /api/favorites/{product_id}/ → Remove product from favorites 
 
-POST /api/cart/ → Add item to cart
+### 6. Orders & Checkout 
+POST /api/orders/checkout/ → Convert cart into an order 
+GET /api/orders/ → Get all orders for logged-in user 
+GET /api/orders/{order_id}/ → Get single order details 
+PATCH /api/orders/{order_id}/status/ → Update order status (admin only) 
 
-PATCH /api/cart/items/{item_id}/ → Update cart item (e.g., quantity)
+### 7. Payments 
+POST /api/payments/initiate/ → Initiate payment (Stripe/PayPal/m-pesa integration) 
+POST /api/payments/verify/ → Verify payment transaction 
+GET /api/payments/history/ → List user’s payment history 
 
-POST /api/cart/items/{item_id}/move-to-favorites/ → add item to favorites
+### 8. Reviews & Ratings 
+POST /api/products/{product_id}/reviews/ → Add review for a product 
+GET /api/products/{product_id}/reviews/ → Get product reviews 
+PATCH /api/reviews/{review_id}/ → Update review 
+DELETE /api/reviews/{review_id}/ → Delete review 
 
-DELETE /api/cart/items/{item_id}/ → Remove item from cart
-
-DELETE /api/cart/clear/ → Clear the entire cart
-
-### 5. Wishlist
-GET /api/favorites/ → Get all favorite items
-
-POST /api/favorites/add/ → Add product to favorites
-
-DELETE /api/favorites/{product_id}/ → Remove product from favorites
-
-### 6. Orders & Checkout
-POST /api/orders/checkout/ → Convert cart into an order
-
-GET /api/orders/ → Get all orders for logged-in user
-
-GET /api/orders/{order_id}/ → Get single order details
-
-PATCH /api/orders/{order_id}/status/ → Update order status (admin only)
-
-### 7. Payments
-
-POST /api/payments/initiate/ → Initiate payment (Stripe/PayPal/m-pesa integration)
-
-POST /api/payments/verify/ → Verify payment transaction
-
-GET /api/payments/history/ → List user’s payment history
-
-### 8. Reviews & Ratings
-POST /api/products/{product_id}/reviews/ → Add review for a product
-
-GET /api/products/{product_id}/reviews/ → Get product reviews
-
-PATCH /api/reviews/{review_id}/ → Update review
-
-DELETE /api/reviews/{review_id}/ → Delete review
-
-### 9.Admin
-
-GET /api/users/admin/dashboard/ → Sales summary, order counts, etc.
-
-GET /api/users/admin/users/ → Manage users
-
-GET /api/users/admin/orders/ → Manage all orders
-
+### 9.Admin 
+GET /api/users/admin/dashboard/ → Sales summary, order counts, etc. 
+GET /api/users/admin/users/ → Manage users 
+GET /api/users/admin/orders/ → Manage all orders 
 GET /api/users/admin/products/low-stock/ → Inventory alerts
 
- 
+## Database & Process Flows
 
-## Entity Relationship Diagram and Flowchart
+- Link to the → **[ERD](https://dbdiagram.io/d/Geocel-Enterprises-ERD-666c20c6a179551be6e449bf)** 
+- Link to the → **[FlowChart for processes](https://excalidraw.com/#json=L8IIOeAZwBUv1s2RahAJ0,nmx8XTwIhszSTSpf8G2-RA)**
 
-- Link to  the  → **[ERD](https://dbdiagram.io/d/Geocel-Enterprises-ERD-666c20c6a179551be6e449bf)**
-- Link to the  → **[FlowChart for processes](https://excalidraw.com/#json=L8IIOeAZwBUv1s2RahAJ0,nmx8XTwIhszSTSpf8G2-RA)**
+## Contribution
 
+Contributions are welcome!
+
+    Fork the repo
+
+    Create a new branch (feature/new-feature)
+
+    Commit changes
+
+    Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License – free to use and modify.
