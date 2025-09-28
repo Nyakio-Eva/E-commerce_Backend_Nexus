@@ -15,6 +15,9 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ("role", "is_active", "is_staff", "is_superuser")
     ordering = ("id",)
 
+    # Mark auto-managed fields as read-only
+    readonly_fields = ("created_at", "updated_at")
+
     # Fields shown on the user detail page
     fieldsets = (
         (None, {"fields": ("email", "password")}),
