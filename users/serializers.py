@@ -11,7 +11,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'password_confirm', 'role')
+        fields = ('email', 'password', 'password_confirm') 
 
     def validate(self, data):
         if data['password'] != data['password_confirm']:
@@ -22,10 +22,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         # Remove password_confirm before creating user
         validated_data.pop('password_confirm', None)
         
+        # Always create users as customers (cannot self-assign admin role)
         user = User.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
-            role=validated_data.get('role', User.CUSTOMER),
+            role=User.CUSTOMER,  # Force customer role
+            is_staff=False,  # Explicitly set is_staff to False
         )
         return user
 
@@ -33,6 +35,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         # Remove password_confirm from response
         data.pop('password_confirm', None)
+        
+        # Include role in response (computed from the user object)
+        data['role'] = instance.role
         
         refresh = RefreshToken.for_user(instance)
         data['tokens'] = {
@@ -53,7 +58,8 @@ class LoginSerializer(TokenObtainPairSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'role')    
+        fields = ('id', 'email', 'role')
+        read_only_fields = ('role',)  # Make role read-only
         
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
@@ -61,4 +67,4 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    new_password = serializers.CharField()        
+    new_password = serializers.CharField()

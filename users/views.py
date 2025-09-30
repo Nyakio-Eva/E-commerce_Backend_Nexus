@@ -1,50 +1,37 @@
+# views.py - Simplified version
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework import generics, status, permissions
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.db.models import Sum
-from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-
 
 from products.models import Product
 from orders.models import Order
 
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer,
+    ChangePasswordSerializer, ResetPasswordSerializer,
 )
 from products.serializers import ProductListSerializer
 from orders.serializers import OrderSerializer
 from core.pagination import StandardResultsSetPagination
 
-from .serializers import (
-    RegisterSerializer,
-    LoginSerializer,
-    UserSerializer,
-    ChangePasswordSerializer,
-    ResetPasswordSerializer,
-)
-
 User = get_user_model()
 
-
-# Registration (public)
+# Registration (public) - Always creates regular users
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]   
 
-
 # Login (public)
 class LoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
     permission_classes = [permissions.AllowAny]  
-
 
 # Profile (requires authentication)
 class ProfileView(generics.RetrieveUpdateAPIView):
@@ -53,7 +40,6 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user    
-
 
 # Change password (requires authentication)
 class ChangePasswordView(generics.UpdateAPIView):
@@ -83,7 +69,6 @@ class ChangePasswordView(generics.UpdateAPIView):
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 # Reset password (public)
 class ResetPasswordView(generics.GenericAPIView):
@@ -123,6 +108,7 @@ class AdminDashboardView(APIView):
         
         pending_orders = Order.objects.filter(status=Order.PENDING).count()
         total_products = Product.objects.filter(is_active=True).count()
+        # Count customer users (can use either role or is_staff)
         total_users = User.objects.filter(role=User.CUSTOMER).count()
         
         # Recent orders
@@ -166,7 +152,7 @@ class AdminUserListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     pagination_class = StandardResultsSetPagination
     filter_backends = [SearchFilter, OrderingFilter]
-    search_fields = ['email', 'username']
+    search_fields = ['email', 'first_name', 'last_name']
     ordering_fields = ['created_at', 'email']
     ordering = ['-created_at']
 
