@@ -4,6 +4,7 @@ from .views import (
     ChangePasswordView, ResetPasswordView,
     AdminDashboardView, AdminUserListView,
     AdminOrderListView, LowStockProductsView,
+    verify_email, resend_verification_email,
 )
 
 urlpatterns = [
@@ -12,6 +13,10 @@ urlpatterns = [
     path('me/', ProfileView.as_view(), name='profile'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
     path('reset-password/', ResetPasswordView.as_view(), name='reset_password'),
+    # Email verification endpoints
+    path('verify-email/', verify_email, name='verify-email'),
+    path('resend-verification/', resend_verification_email, name='resend-verification'),
+    
     #admin urls
     path('admin/dashboard/', AdminDashboardView.as_view(), name='admin-dashboard'),
     path('admin/users/', AdminUserListView.as_view(), name='admin-users'),

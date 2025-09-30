@@ -2,49 +2,40 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .utils import send_verification_email
 
 User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
-    password_confirm = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True, min_length=8)
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'password_confirm') 
+        fields = ['email', 'password', 'password2', 'first_name', 'last_name']
 
-    def validate(self, data):
-        if data['password'] != data['password_confirm']:
-            raise serializers.ValidationError("Passwords don't match")
-        return data
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password": "Password fields didn't match."})
+        return attrs
 
     def create(self, validated_data):
-        # Remove password_confirm before creating user
-        validated_data.pop('password_confirm', None)
-        
-        # Always create users as customers (cannot self-assign admin role)
+        validated_data.pop('password2')
         user = User.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
-            role=User.CUSTOMER,  # Force customer role
-            is_staff=False,  # Explicitly set is_staff to False
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
         )
+        
+        # Send verification email
+        try:
+            send_verification_email(user)
+        except Exception as e:
+            # Log error but don't fail registration
+            print(f"Error sending verification email: {e}")
+        
         return user
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        # Remove password_confirm from response
-        data.pop('password_confirm', None)
-        
-        # Include role in response (computed from the user object)
-        data['role'] = instance.role
-        
-        refresh = RefreshToken.for_user(instance)
-        data['tokens'] = {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }
-        return data
     
 class LoginSerializer(TokenObtainPairSerializer):
     @classmethod

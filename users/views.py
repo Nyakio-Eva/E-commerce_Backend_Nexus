@@ -4,10 +4,15 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
+
+
 
 from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from .models import EmailVerificationToken
+from .utils import send_verification_email
 
 from products.models import Product
 from orders.models import Order
@@ -177,3 +182,92 @@ class LowStockProductsView(generics.ListAPIView):
             is_active=True,
             stock__lte=threshold
         ).order_by('stock')
+        
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def verify_email(request):
+    """Verify user email with token"""
+    token = request.query_params.get('token')
+    
+    if not token:
+        return Response(
+            {'error': 'Token is required'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        verification_token = EmailVerificationToken.objects.get(token=token)
+        
+        if verification_token.is_used:
+            return Response(
+                {'error': 'This verification link has already been used'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if verification_token.is_expired():
+            return Response(
+                {'error': 'This verification link has expired'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Verify the user
+        user = verification_token.user
+        user.is_email_verified = True
+        user.save()
+        
+        # Mark token as used
+        verification_token.is_used = True
+        verification_token.save()
+        
+        return Response({
+            'message': 'Email verified successfully! You can now log in.'
+        }, status=status.HTTP_200_OK)
+        
+    except EmailVerificationToken.DoesNotExist:
+        return Response(
+            {'error': 'Invalid verification token'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def resend_verification_email(request):
+    """Resend verification email"""
+    email = request.data.get('email')
+    
+    if not email:
+        return Response(
+            {'error': 'Email is required'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        user = User.objects.get(email=email)
+        
+        if user.is_email_verified:
+            return Response(
+                {'message': 'Email is already verified'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Invalidate old tokens
+        EmailVerificationToken.objects.filter(
+            user=user, 
+            is_used=False
+        ).update(is_used=True)
+        
+        # Send new verification email
+        send_verification_email(user)
+        
+        return Response({
+            'message': 'Verification email sent successfully'
+        }, status=status.HTTP_200_OK)
+        
+    except User.DoesNotExist:
+        return Response(
+            {'error': 'User not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )

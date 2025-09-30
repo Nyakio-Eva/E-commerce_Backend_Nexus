@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 14px 28px;
+            margin: 20px 0;
+            background-color: #007bff;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .link {
+            word-break: break-all;
+            color: #007bff;
+        }
+        .footer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h2>Welcome to {{ site_name }}!</h2>
+            <p>Hi {{ user.email }},</p>
+            <p>Thank you for registering with us. To complete your registration and start shopping, please verify your email address by clicking the button below:</p>
+            
+            <center>
+                <a href="{{ verification_url }}" class="button">Verify Email Address</a>
+            </center>
+            
+            <p>Or copy and paste this link into your browser:</p>
+            <p class="link">{{ verification_url }}</p>
+            
+            <p><strong>This link will expire in 24 hours.</strong></p>
+            
+            <div class="footer">
+                <p>If you didn't create an account with {{ site_name }}, you can safely ignore this email.</p>
+                <p>This is an automated message, please do not reply to this email.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
